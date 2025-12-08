@@ -5,20 +5,26 @@ import FinanceDashboard from './components/FinanceDashboard';
 import ReportGenerator from './components/ReportGenerator';
 import DataEditor from './components/DataEditor';
 import Login from './components/Login';
-import { fetchWeeklyData, saveWeeklyData } from './services/dataService';
+import { fetchWeeklyData, saveWeeklyData, checkDbConnection } from './services/dataService';
 import { CURRENT_WEEK_DATA } from './constants';
 import { WeeklyData, User } from './types';
-import { Pencil, Loader2 } from 'lucide-react';
+import { Pencil, Loader2, LogOut, Database, WifiOff } from 'lucide-react';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [data, setData] = useState<WeeklyData>(CURRENT_WEEK_DATA);
   const [loading, setLoading] = useState(true);
+  const [dbConnected, setDbConnected] = useState<boolean>(false);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
+      // Check connection first
+      const isConnected = await checkDbConnection();
+      setDbConnected(isConnected);
+      
+      // Then fetch data
       const fetchedData = await fetchWeeklyData();
       setData(fetchedData);
       setLoading(false);
@@ -66,8 +72,8 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7] flex font-sans text-gray-900">
-      {/* Sidebar */}
+    <div className="min-h-screen bg-[#F5F5F7] font-sans text-gray-900">
+      {/* Navigation (Bottom on Mobile, Left on Desktop) */}
       <div className="print:hidden">
         <Sidebar 
             activeTab={activeTab} 
@@ -78,10 +84,28 @@ const App: React.FC = () => {
         />
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 ml-64 p-8 print:ml-0 print:p-0">
-        <header className="mb-8 flex justify-between items-center print:hidden animate-fade-in-down">
-          <div>
+      {/* Main Content Area */}
+      <div className="
+        w-full 
+        /* Mobile: Bottom Nav Spacing */
+        pb-28 px-4 pt-4
+        /* Desktop: Left Sidebar Spacing */
+        md:ml-64 md:p-8 md:pb-8
+        print:ml-0 print:p-0
+      ">
+        <header className="mb-6 md:mb-8 flex justify-between items-center print:hidden animate-fade-in-down">
+          
+          {/* Mobile Header Left: Logo + Brand */}
+          <div className="flex items-center gap-3 md:hidden">
+            <img src="https://aaraainfrastructure.com/logo.png" alt="AARAA" className="h-8 object-contain" />
+            <div>
+              <h1 className="text-lg font-bold text-gray-900 leading-none">AARAA</h1>
+              <p className="text-[10px] text-gray-500 font-medium tracking-wider">INFRASTRUCTURE</p>
+            </div>
+          </div>
+
+          {/* Desktop Header Left: Page Titles */}
+          <div className="hidden md:block">
             <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
               {activeTab === 'dashboard' ? 'Procurement Overview' : 
                activeTab === 'finance-dashboard' ? 'Financial Control Center' :
@@ -93,12 +117,29 @@ const App: React.FC = () => {
                 : `Hello ${user.name.split(' ')[0]}, here's your weekly summary.`}
             </p>
           </div>
-          <div className="text-right flex items-center gap-3">
-             <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm">
+          
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-3">
+             
+             {/* DB Status Indicator */}
+             <div className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-sm text-xs font-semibold ${
+               dbConnected ? 'bg-green-50 border-green-200 text-green-700' : 'bg-orange-50 border-orange-200 text-orange-700'
+             }`}>
+                {dbConnected ? <Database size={14} /> : <WifiOff size={14} />}
+                {dbConnected ? 'Online' : 'Local Mode'}
+             </div>
+
+             <div className="hidden md:flex items-center gap-3 bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm">
                 <span className="text-sm font-medium text-gray-500">
                   Week of: <span className="text-gray-900 font-bold">{data.weekStarting}</span>
                 </span>
              </div>
+
+             {/* Mobile: Week Badge (Small) */}
+             <div className="md:hidden flex items-center bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm">
+                <span className="text-xs font-bold text-gray-900">{data.weekStarting.split(',')[0]}</span>
+             </div>
+
              {user.role === 'procurement' && activeTab !== 'data-entry' && (
                  <button 
                   onClick={() => setActiveTab('data-entry')}
@@ -108,8 +149,33 @@ const App: React.FC = () => {
                    <Pencil size={18} />
                  </button>
              )}
+
+             {/* Mobile Logout Button (Visible only on mobile) */}
+             <button 
+               onClick={handleLogout}
+               className="md:hidden bg-white p-2 rounded-full border border-gray-200 shadow-sm text-gray-500 hover:text-red-600 transition-colors"
+               title="Sign Out"
+             >
+               <LogOut size={18} />
+             </button>
           </div>
         </header>
+
+        {/* Mobile Page Title (Below header for layout balance) */}
+        <div className="mb-6 md:hidden flex justify-between items-center">
+             <h2 className="text-2xl font-bold text-gray-900">
+               {activeTab === 'dashboard' ? 'Overview' : 
+                activeTab === 'finance-dashboard' ? 'Finance' :
+                activeTab === 'report' ? 'Reports' : 'System Data'}
+             </h2>
+             
+             {/* Mobile DB Status */}
+             <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+                dbConnected ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'
+             }`}>
+                {dbConnected ? <Database size={16} /> : <WifiOff size={16} />}
+             </div>
+        </div>
 
         <main className="animate-fade-in-up">
           {activeTab === 'dashboard' && user.role === 'procurement' && (

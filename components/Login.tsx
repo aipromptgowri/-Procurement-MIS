@@ -21,9 +21,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setTimeout(() => {
       if (password === 'Aaraa@123') {
         if (username === 'proc') {
-          onLogin({ username: 'proc', role: 'procurement', name: 'Procurement Manager' });
+          onLogin({ username: 'proc', role: 'procurement', name: 'Rajendran A' });
         } else if (username === 'acc') {
-          onLogin({ username: 'acc', role: 'finance', name: 'Finance Controller' });
+          onLogin({ username: 'acc', role: 'finance', name: 'Sudha R' });
         } else {
           setError('Invalid username');
         }

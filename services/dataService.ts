@@ -6,6 +6,23 @@ import { CURRENT_WEEK_DATA } from '../constants';
 // In a full version, you might have a table with multiple weeks.
 const REPORT_ID = 1;
 
+export const checkDbConnection = async (): Promise<boolean> => {
+  try {
+    const { count, error } = await supabase
+      .from('weekly_reports')
+      .select('*', { count: 'exact', head: true });
+    
+    if (error) {
+      console.warn("Supabase connection check failed:", error.message);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.warn("Supabase connection check exception:", error);
+    return false;
+  }
+};
+
 export const fetchWeeklyData = async (): Promise<WeeklyData> => {
   try {
     const { data, error } = await supabase

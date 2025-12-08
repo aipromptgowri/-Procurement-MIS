@@ -172,12 +172,28 @@ const DataEditor: React.FC<DataEditorProps> = ({ data, onSave, userRole }) => {
           </div>
         </div>
       </div>
-      {/* Reduced for brevity, logic remains same for other KPI fields */}
+      
+       <div className={cardClass}>
+        <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <Truck size={18} className="text-[#ed2f39]"/> Delivery Metrics
+        </h4>
+        <div className="space-y-4">
+          <div>
+            <label className={labelClass}>Deliveries Completed</label>
+            <input type="number" value={localData.deliveriesCompleted} onChange={(e) => updateField('deliveriesCompleted', Number(e.target.value))} className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Deliveries Delayed</label>
+            <input type="number" value={localData.deliveriesDelayed} onChange={(e) => updateField('deliveriesDelayed', Number(e.target.value))} className={inputClass} />
+          </div>
+           <div>
+            <label className={labelClass}>Quality Issues</label>
+            <input type="number" value={localData.qualityIssuesReported} onChange={(e) => updateField('qualityIssuesReported', Number(e.target.value))} className={inputClass} />
+          </div>
+        </div>
+      </div>
     </div>
   );
-
-  // Simplified render logic for other tabs to save space but maintaining functionality
-  // ... (Projects, POs, Vendors code remains identical logic-wise, just applying new CSS classes)
 
   const renderProjectsTab = () => (
       <div className="space-y-4">
@@ -189,7 +205,9 @@ const DataEditor: React.FC<DataEditorProps> = ({ data, onSave, userRole }) => {
                }} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors">
                <Trash2 size={18}/>
              </button>
-             <h4 className="font-bold text-gray-900 mb-4 border-b pb-2">{project.name}</h4>
+             <h4 className="font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                <Building2 size={16} className="text-[#ed2f39]"/> {project.name}
+             </h4>
              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
                   <label className={labelClass}>Project Name</label>
@@ -205,7 +223,35 @@ const DataEditor: React.FC<DataEditorProps> = ({ data, onSave, userRole }) => {
                     setLocalData({...localData, projects: newP});
                   }} className={inputClass} />
                 </div>
-                {/* ... other fields ... */}
+                <div>
+                   <label className={labelClass}>Req. Received</label>
+                   <input type="number" value={project.materialRequirementsReceived} onChange={(e) => {
+                    const newP = [...localData.projects]; newP[idx].materialRequirementsReceived = Number(e.target.value);
+                    setLocalData({...localData, projects: newP});
+                  }} className={inputClass} />
+                </div>
+                <div>
+                   <label className={labelClass}>POs Raised</label>
+                   <input type="number" value={project.posRaisedCount} onChange={(e) => {
+                    const newP = [...localData.projects]; newP[idx].posRaisedCount = Number(e.target.value);
+                    setLocalData({...localData, projects: newP});
+                  }} className={inputClass} />
+                </div>
+                 <div>
+                   <label className={labelClass}>Deliveries</label>
+                   <input type="number" value={project.deliveriesCompleted} onChange={(e) => {
+                    const newP = [...localData.projects]; newP[idx].deliveriesCompleted = Number(e.target.value);
+                    setLocalData({...localData, projects: newP});
+                  }} className={inputClass} />
+                </div>
+             </div>
+             
+             <div className="mt-4">
+                 <label className={labelClass}>Critical Shortages (Comma separated)</label>
+                 <input type="text" value={project.criticalShortages.join(', ')} onChange={(e) => {
+                    const newP = [...localData.projects]; newP[idx].criticalShortages = e.target.value.split(',').map(s => s.trim()).filter(s => s);
+                    setLocalData({...localData, projects: newP});
+                  }} className={inputClass} placeholder="e.g. Cement, Steel" />
              </div>
           </div>
         ))}
@@ -220,29 +266,95 @@ const DataEditor: React.FC<DataEditorProps> = ({ data, onSave, userRole }) => {
       </div>
   );
   
-  // Reusing similar structures for POs, Vendors, Materials but applying styling
   const renderPOSTab = () => (
       <div className="space-y-4">
           {localData.highValuePOs.map((po, idx) => (
-             <div key={po.poNumber} className={cardClass}>
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div><label className={labelClass}>PO Number</label><input type="text" value={po.poNumber} className={inputClass} onChange={(e) => {
+             <div key={po.poNumber || idx} className={cardClass}>
+                 <button onClick={() => {
+                      const newPOs = localData.highValuePOs.filter((_, i) => i !== idx);
+                      setLocalData({...localData, highValuePOs: newPOs});
+                   }} className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition-colors">
+                   <Trash2 size={18}/>
+                 </button>
+                 <h4 className="font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                    <ShoppingCart size={16} className="text-[#ed2f39]"/>
+                    {po.poNumber || 'New PO'}
+                 </h4>
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div>
+                        <label className={labelClass}>PO Number</label>
+                        <input type="text" value={po.poNumber} className={inputClass} onChange={(e) => {
                           const newPOs = [...localData.highValuePOs]; newPOs[idx].poNumber = e.target.value; setLocalData({...localData, highValuePOs: newPOs});
-                      }}/></div>
-                      <div><label className={labelClass}>Vendor</label><input type="text" value={po.vendorName} className={inputClass} onChange={(e) => {
+                        }}/>
+                      </div>
+                      <div>
+                        <label className={labelClass}>Vendor Name</label>
+                        <input type="text" value={po.vendorName} className={inputClass} onChange={(e) => {
                           const newPOs = [...localData.highValuePOs]; newPOs[idx].vendorName = e.target.value; setLocalData({...localData, highValuePOs: newPOs});
-                      }}/></div>
-                       <div><label className={labelClass}>Value</label><input type="number" value={po.value} className={inputClass} onChange={(e) => {
+                        }}/>
+                      </div>
+                      <div>
+                        <label className={labelClass}>Project Name</label>
+                        <input type="text" value={po.projectName} className={inputClass} onChange={(e) => {
+                          const newPOs = [...localData.highValuePOs]; newPOs[idx].projectName = e.target.value; setLocalData({...localData, highValuePOs: newPOs});
+                        }}/>
+                      </div>
+                      <div>
+                        <label className={labelClass}>Material</label>
+                        <input type="text" value={po.materialName} className={inputClass} onChange={(e) => {
+                          const newPOs = [...localData.highValuePOs]; newPOs[idx].materialName = e.target.value; setLocalData({...localData, highValuePOs: newPOs});
+                        }}/>
+                      </div>
+                       <div>
+                        <label className={labelClass}>Value (₹)</label>
+                        <input type="number" value={po.value} className={inputClass} onChange={(e) => {
                           const newPOs = [...localData.highValuePOs]; newPOs[idx].value = Number(e.target.value); setLocalData({...localData, highValuePOs: newPOs});
-                      }}/></div>
+                        }}/>
+                      </div>
+                      <div>
+                        <label className={labelClass}>Delivery Due Date</label>
+                        <input type="date" value={po.deliveryDueDate} className={inputClass} onChange={(e) => {
+                          const newPOs = [...localData.highValuePOs]; newPOs[idx].deliveryDueDate = e.target.value; setLocalData({...localData, highValuePOs: newPOs});
+                        }}/>
+                      </div>
+                      <div>
+                        <label className={labelClass}>Status</label>
+                        <select value={po.status} className={inputClass} onChange={(e) => {
+                            const newPOs = [...localData.highValuePOs]; newPOs[idx].status = e.target.value as POStatus; setLocalData({...localData, highValuePOs: newPOs});
+                        }}>
+                             {Object.values(POStatus).map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                     </div>
                  </div>
              </div>
           ))}
+          <button onClick={() => {
+              setLocalData({
+                  ...localData, 
+                  highValuePOs: [...localData.highValuePOs, {
+                    poNumber: `PO-23-${1100 + localData.highValuePOs.length}`,
+                    vendorId: '',
+                    vendorName: '',
+                    projectId: '',
+                    projectName: '',
+                    materialName: '',
+                    value: 0,
+                    dateRaised: new Date().toISOString().split('T')[0],
+                    deliveryDueDate: '',
+                    status: POStatus.PENDING
+                  }]
+              })
+            }} className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-[#ed2f39] hover:text-[#ed2f39] transition-colors flex items-center justify-center gap-2 font-medium bg-gray-50">
+              <Plus size={18} /> Add New PO
+            </button>
       </div>
   );
 
   const renderMaterialsTab = () => (
       <div className={cardClass}>
+           <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <Package size={18} className="text-[#ed2f39]"/> Top Materials
+          </h4>
           <table className="w-full">
               {localData.topMaterials.map((mat, idx) => (
                   <tr key={idx} className="border-b border-gray-100 last:border-0">
@@ -273,6 +385,12 @@ const DataEditor: React.FC<DataEditorProps> = ({ data, onSave, userRole }) => {
                              {Object.values(VendorRating).map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
                      </div>
+                      <div><label className={labelClass}>On-Time Score (%)</label><input type="number" value={vendor.onTimeDeliveryScore} className={inputClass} onChange={(e) => {
+                         const newV = [...localData.vendors]; newV[idx].onTimeDeliveryScore = Number(e.target.value); setLocalData({...localData, vendors: newV});
+                     }}/></div>
+                      <div><label className={labelClass}>Avg Lead Time (Days)</label><input type="number" value={vendor.avgLeadTime} className={inputClass} onChange={(e) => {
+                         const newV = [...localData.vendors]; newV[idx].avgLeadTime = Number(e.target.value); setLocalData({...localData, vendors: newV});
+                     }}/></div>
                  </div>
              </div>
           ))}
