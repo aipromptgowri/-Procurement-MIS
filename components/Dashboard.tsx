@@ -20,11 +20,12 @@ interface DashboardProps {
   data: WeeklyData;
 }
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+// AARAA Red Theme Colors
+const COLORS = ['#ed2f39', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 const Dashboard: React.FC<DashboardProps> = ({ data }) => {
   const projectChartData = data.projects.map(p => ({
-    name: p.name.split(' ')[0], // Short name
+    name: p.name.split(' ')[0],
     utilization: p.budgetUtilization,
     pos: p.posRaisedCount
   }));
@@ -35,7 +36,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total PO Value"
@@ -70,26 +71,27 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Project Budget Utilization */}
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Project Budget Utilization</h3>
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <h3 className="text-lg font-bold text-gray-900 mb-6">Project Budget Utilization</h3>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={projectChartData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                <YAxis unit="%" axisLine={false} tickLine={false} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6b7280'}} />
+                <YAxis unit="%" axisLine={false} tickLine={false} tick={{fill: '#6b7280'}} />
                 <Tooltip
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                  cursor={{fill: '#f3f4f6'}}
                 />
-                <Bar dataKey="utilization" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Budget %" />
+                <Bar dataKey="utilization" fill="#ed2f39" radius={[4, 4, 0, 0]} name="Budget %" barSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Top 5 Materials Spend */}
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Top 5 Materials (Spend)</h3>
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <h3 className="text-lg font-bold text-gray-900 mb-6">Top 5 Materials (Spend)</h3>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -108,9 +110,9 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
                 </Pie>
                 <Tooltip
                   formatter={(value: number) => `₹${(value / 100000).toFixed(1)} L`}
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                 />
-                <Legend />
+                <Legend iconType="circle" />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -118,20 +120,20 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
       </div>
 
       {/* Critical Shortages Alert */}
-      <div className="bg-red-50 border border-red-100 rounded-xl p-6">
+      <div className="bg-red-50/50 border border-red-100 rounded-2xl p-6 backdrop-blur-sm">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-red-100 rounded-full text-red-600">
+          <div className="p-2 bg-red-100 rounded-lg text-[#ed2f39]">
             <AlertTriangle size={20} />
           </div>
-          <h3 className="text-lg font-semibold text-gray-800">Critical Material Shortages</h3>
+          <h3 className="text-lg font-bold text-gray-900">Critical Material Shortages</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {data.projects.filter(p => p.criticalShortages.length > 0).map(project => (
-            <div key={project.id} className="bg-white p-4 rounded-lg shadow-sm">
-              <h4 className="font-medium text-gray-800 mb-2">{project.name}</h4>
-              <ul className="space-y-1">
+            <div key={project.id} className="bg-white p-4 rounded-xl shadow-sm border border-red-100/50">
+              <h4 className="font-bold text-gray-900 mb-2">{project.name}</h4>
+              <ul className="space-y-2">
                 {project.criticalShortages.map((item, idx) => (
-                  <li key={idx} className="text-sm text-red-600 flex items-center gap-2">
+                  <li key={idx} className="text-sm text-red-600 flex items-center gap-2 font-medium">
                     <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
                     {item}
                   </li>

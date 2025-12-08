@@ -1,4 +1,4 @@
-import { POStatus, VendorRating, WeeklyData } from './types';
+import { POStatus, VendorRating, WeeklyData, InvoiceStatus } from './types';
 
 export const CURRENT_WEEK_DATA: WeeklyData = {
   weekStarting: 'Oct 23, 2023',
@@ -110,4 +110,15 @@ export const CURRENT_WEEK_DATA: WeeklyData = {
       avgLeadTime: 2,
     },
   ],
+  finance: {
+    totalOutstandingPayables: 4500000,
+    overduePayables: 120000,
+    weeklyCashFlowReq: 1800000,
+    budgetUtilizedTotal: 78,
+    recentInvoices: [
+      { id: 'INV-001', vendorName: 'Tata Steel Ltd', poNumber: 'PO-23-1098', amount: 3500000, dueDate: '2023-11-15', status: InvoiceStatus.PENDING },
+      { id: 'INV-002', vendorName: 'Ultratech Cement', poNumber: 'PO-23-1102', amount: 1200000, dueDate: '2023-10-30', status: InvoiceStatus.OVERDUE },
+      { id: 'INV-003', vendorName: 'Local Aggregates Co.', poNumber: 'PO-23-1055', amount: 45000, dueDate: '2023-10-20', status: InvoiceStatus.PAID },
+    ]
+  }
 };

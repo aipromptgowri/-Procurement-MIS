@@ -12,6 +12,12 @@ export enum POStatus {
   DELAYED = 'Delayed'
 }
 
+export enum InvoiceStatus {
+  PAID = 'Paid',
+  PENDING = 'Pending',
+  OVERDUE = 'Overdue'
+}
+
 export interface Material {
   id: string;
   name: string;
@@ -39,6 +45,23 @@ export interface PurchaseOrder {
   status: POStatus;
 }
 
+export interface Invoice {
+  id: string;
+  vendorName: string;
+  poNumber: string;
+  amount: number;
+  dueDate: string;
+  status: InvoiceStatus;
+}
+
+export interface FinanceData {
+  totalOutstandingPayables: number;
+  overduePayables: number;
+  weeklyCashFlowReq: number;
+  budgetUtilizedTotal: number;
+  recentInvoices: Invoice[];
+}
+
 export interface ProjectStats {
   id: string;
   name: string;
@@ -64,6 +87,7 @@ export interface WeeklyData {
   projects: ProjectStats[];
   highValuePOs: PurchaseOrder[];
   vendors: Vendor[];
+  finance: FinanceData;
 }
 
 export interface GeneratedReportSections {
@@ -72,4 +96,12 @@ export interface GeneratedReportSections {
   actionItems: string;
   conclusion: string;
   vendorFollowUps: string;
+}
+
+export type UserRole = 'procurement' | 'finance';
+
+export interface User {
+  username: string;
+  role: UserRole;
+  name: string;
 }
