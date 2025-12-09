@@ -19,7 +19,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
     // Simulated network delay
     setTimeout(() => {
-      if (password === 'Aaraa@123') {
+      if (password === '123') {
         if (username === 'proc') {
           onLogin({ username: 'proc', role: 'procurement', name: 'Rajendran A' });
         } else if (username === 'acc') {

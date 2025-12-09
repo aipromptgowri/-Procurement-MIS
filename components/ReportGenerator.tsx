@@ -96,7 +96,7 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ data }) => {
       </div>
 
       {/* Report Content */}
-      <div className="p-10 max-w-5xl mx-auto space-y-10 report-scroll text-sm md:text-base">
+      <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-10 report-scroll text-sm md:text-base">
         
         {/* 1. Executive Summary */}
         <section>
@@ -132,8 +132,7 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ data }) => {
             </div>
           </div>
           
-          {/* ... (rest of the table code simplified for brevity but functionally identical) ... */}
-           <div className="overflow-hidden rounded-xl border border-gray-200">
+           <div className="overflow-x-auto rounded-xl border border-gray-200">
             <table className="min-w-full text-sm text-left">
               <thead className="bg-gray-50 text-gray-700 font-semibold uppercase text-xs">
                 <tr>

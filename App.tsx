@@ -86,7 +86,6 @@ const App: React.FC = () => {
 
       {/* Main Content Area */}
       <div className="
-        w-full 
         /* Mobile: Bottom Nav Spacing */
         pb-28 px-4 pt-4
         /* Desktop: Left Sidebar Spacing */
